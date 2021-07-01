@@ -50,10 +50,7 @@ cards.forEach((item) => {
 });
 
 function showData() {
-  let counterITEM = 0;
   let cardCarts = cardWraper.querySelectorAll(".card");
-  counterITEM = cardCarts.length;
-
-  counter.textContent = counterITEM;
+  counter.textContent = cardCarts.length;
 }
 //Cart Items END
