@@ -14,7 +14,7 @@ function toggleCheckbox() {
     });
   });
 }
-toggleCheckbox();
+
 // * checkbox END
 
 //! Cart
@@ -33,8 +33,6 @@ function toggleCart() {
     document.body.style.overflow = "";
   });
 }
-
-toggleCart();
 
 //* Cart END
 
@@ -88,7 +86,6 @@ function addCardItem() {
   }
 }
 
-addCardItem();
 // * Add Items To The Cart
 
 // ! Sale Filters
@@ -148,13 +145,13 @@ function actionPage() {
   }
 }
 // * Filters (Sale Price) END
-actionPage();
+
 // * Sale Filters End
 
 // ! Fetch DB
 function getData() {
   const goodsWrapper = document.querySelector(".goods");
-  fetch("../db/db.json")
+  return fetch("../db/db.json")
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -162,7 +159,9 @@ function getData() {
         throw new Error(`Data don't receivet, error: ` + response.status);
       }
     })
-    .then((data) => renderCards(data))
+    .then((data) => {
+      return data;
+    })
     .catch((err) => {
       console.warn(err);
       goodsWrapper.innerHTML = `<div>Upss  </div>`;
@@ -170,13 +169,12 @@ function getData() {
 }
 
 function renderCards(data) {
-  console.log(data.goods[0]);
   const goodsWrapper = document.querySelector(".goods");
   data.goods.forEach((item) => {
     const card = document.createElement("div");
     card.className = "col-12 col-md-6 col-lg-4 col-xl-3";
     card.innerHTML = `
-                  <div class="card">
+                  <div class="card" data-category="${item.category}">
                   ${
                     item.sale ? "<div class='card-sale'>🔥Hot Sale🔥</div>" : ""
                   }
@@ -198,4 +196,48 @@ function renderCards(data) {
     goodsWrapper.appendChild(card);
   });
 }
-getData();
+
+function renderCatalog() {
+  const cards = document.querySelectorAll(".goods .card");
+  const catalogBtn = document.querySelector(".catalog-button");
+  const catalogList = document.querySelector(".catalog-list");
+  const catalogWraper = document.querySelector(".catalog");
+  const categories = new Set();
+  catalogBtn.addEventListener("click", showCategories);
+
+  cards.forEach((card) => {
+    categories.add(card.dataset.category);
+  });
+
+  categories.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    catalogList.appendChild(li);
+    console.log(item);
+  });
+
+  function showCategories(e) {
+    if (catalogWraper.style.display) {
+      catalogWraper.style.display = "";
+    } else {
+      catalogWraper.style.display = "block";
+    }
+    if (e.target.tagName === "LI") {
+      cards.forEach((item) => {
+        if (item.dataset.category === e.target.textContent) {
+          item.parentNode.style.display = "";
+        } else {
+          item.parentNode.style.display = "none";
+        }
+      });
+    }
+  }
+}
+getData().then((data) => {
+  renderCards(data);
+  toggleCheckbox();
+  actionPage();
+  toggleCart();
+  addCardItem();
+  renderCatalog();
+});
