@@ -153,16 +153,49 @@ actionPage();
 
 // ! Fetch DB
 function getData() {
-  fetch("../db/2db.json")
-    .then((data) => {
-      if (data.ok) {
-        console.log(data);
+  const goodsWrapper = document.querySelector(".goods");
+  fetch("../db/db.json")
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
       } else {
-        throw new Error(data.status);
+        throw new Error(`Data don't receivet, error: ` + response.status);
       }
     })
+    .then((data) => renderCards(data))
     .catch((err) => {
       console.warn(err);
+      goodsWrapper.innerHTML = `<div>Upss  </div>`;
     });
+}
+
+function renderCards(data) {
+  console.log(data.goods[0]);
+  const goodsWrapper = document.querySelector(".goods");
+  data.goods.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "col-12 col-md-6 col-lg-4 col-xl-3";
+    card.innerHTML = `
+                  <div class="card">
+                  ${
+                    item.sale ? "<div class='card-sale'>🔥Hot Sale🔥</div>" : ""
+                  }
+
+                    <div class="card-img-wrapper">
+                      <span class="card-img-top" style="
+                          background-image: url('${item.img}');
+                        "></span>
+                    </div>
+                    <div class="card-body justify-content-between">
+                      <div class="card-price">${item.price} ₽</div>
+                      <h5 class="card-title">
+                        ${item.title}
+                      </h5>
+                      <button class="btn btn-primary">В корзину</button>
+                    </div>
+                  </div>
+                `;
+    goodsWrapper.appendChild(card);
+  });
 }
 getData();
